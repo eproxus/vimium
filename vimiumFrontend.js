@@ -8,6 +8,7 @@ var getCurrentUrlHandlers = []; // function(url)
 
 var insertModeLock = null;
 var findMode = false;
+var findModeMatchIndex = 0;
 var findModeQuery = "";
 var findModeQueryHasResults = false;
 var isShowingHelpDialog = false;
@@ -334,7 +335,7 @@ function copyCurrentUrl() {
   var getCurrentUrlPort = chrome.extension.connect({ name: "getCurrentTabUrl" });
   getCurrentUrlPort.postMessage({});
 
-	HUD.showForDuration("Yanked URL", 1000);
+  HUD.showForDuration("Yanked URL", 1000);
 }
 
 function toggleViewSourceCallback(url) {
@@ -615,8 +616,8 @@ function handleDeleteForFindMode() {
 }
 
 function handleEnterForFindMode() {
-  exitFindMode();
   performFindInPlace();
+  exitFindMode();
 }
 
 function performFindInPlace() {
@@ -635,7 +636,21 @@ function performFindInPlace() {
 }
 
 function executeFind(backwards) {
-  findModeQueryHasResults = window.find(findModeQuery, false, backwards, true, false, true, false);
+  var pattern = new RegExp(findModeQuery, "g");
+  var text = document.body.textContent;
+  var result = text.match(pattern);
+  if ( ! findMode )
+    if (backwards)
+      if (findModeMatchIndex > 0)
+        findModeMatchIndex -= 1;
+      else
+        findModeMatchIndex = result.length - 1;
+    else
+      if (findModeMatchIndex < result.length - 1)
+        findModeMatchIndex += 1;
+      else
+        findModeMatchIndex = 0;
+  findModeQueryHasResults = window.find(result[findModeMatchIndex], false, backwards, true, false, true, false);
 }
 
 function focusFoundLink() {

@@ -24,7 +24,7 @@
              "linkHints.js",
              "vimiumFrontend.js",
              "completionDialog.js",
-             "bookmarks.js"
+             "omni.js"
             ],
       "css": ["vimium.css"],
       "run_at": "document_start",

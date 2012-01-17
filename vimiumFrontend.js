@@ -670,7 +670,7 @@ function findAndFollowLink(linkStrings) {
     if (hasResults) {
       var link = getLinkFromSelection();
       if (link) {
-        window.location = link.href;
+        utils.simulateClick(link);
         return true;
       }
     }
@@ -684,7 +684,7 @@ function findAndFollowRel(value) {
     var elements = document.getElementsByTagName(relTags[i]);
     for (j = 0; j < elements.length; j++) {
       if (elements[j].hasAttribute('rel') && elements[j].rel == value) {
-        window.location = elements[j].href;
+        utils.simulateClick(elements[j]);
         return true;
       }
     }

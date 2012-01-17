@@ -266,16 +266,12 @@ var linkHints = {
   },
 
   simulateClick: function(link) {
-    var event = document.createEvent("MouseEvents");
     // When "clicking" on a link, dispatch the event with the appropriate meta key (CMD on Mac, CTRL on windows)
     // to open it in a new tab if necessary.
     var metaKey = (platform == "Mac" && linkHints.shouldOpenInNewTab);
     var ctrlKey = (platform != "Mac" && linkHints.shouldOpenInNewTab);
-    event.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, ctrlKey, false, false, metaKey, 0, null);
 
-    // Debugging note: Firefox will not execute the link's default action if we dispatch this click event,
-    // but Webkit will. Dispatching a click on an input box does not seem to focus it; we do that separately
-    link.dispatchEvent(event);
+    utils.simulateClick(link, { metaKey: metaKey, ctrlKey: ctrlKey });
 
     // TODO(int3): do this for @role='link' and similar elements as well
     var nodeName = link.nodeName.toLowerCase();

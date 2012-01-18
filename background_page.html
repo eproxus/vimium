@@ -243,7 +243,7 @@
    * We should now dismiss that message in all tabs.
    */
   function upgradeNotificationClosed(request) {
-    settings.set("previousVersion", currentVersion);
+    settings.setVersion(currentVersion);
     sendRequestToAllTabs({ name: "hideUpgradeNotification" });
   }
 
@@ -615,9 +615,9 @@
   function shouldShowUpgradeMessage() {
     // Avoid showing the upgrade notification when previousVersion is undefined, which is the case for new
     // installs.
-    if (!settings.get("previousVersion"))
-      settings.set("previousVersion", currentVersion);
-    return compareVersions(currentVersion, localStorage.previousVersion) == 1;
+    if (!settings.getPreviousVersion())
+      settings.setVersion(currentVersion);
+    return compareVersions(currentVersion, settings.getPreviousVersion()) == 1;
   }
 
   function openOptionsPageInNewTab() {
@@ -695,7 +695,7 @@
     // In version 1.22, we changed the mapping for "d" and "u" to be scroll page down/up instead of close
     // and restore tab. For existing users, we want to preserve existing behavior for them by adding some
     // custom key mappings on their behalf.
-    if (localStorage.previousVersion == "1.21") {
+    if (settings.getPreviousVersion() == "1.21") {
       var customKeyMappings = settings.get("keyMappings") || "";
       if ((keyToCommandRegistry["d"] || {}).command == "scrollPageDown")
         customKeyMappings += "\nmap d removeTab";
@@ -705,6 +705,9 @@
         settings.set("keyMappings", customKeyMappings);
         parseCustomKeyMappings(customKeyMappings);
       }
+    }
+    else if (compareVersions(settings.getPreviousVersion(), "1.30") <= 0) {
+      settings.migrateToJSON();
     }
 
     populateValidFirstKeys();

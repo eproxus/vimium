@@ -50,4 +50,23 @@ var settings = {
     return key in localStorage;
   },
 
+  migrateToJSON: function() {
+    for (var key in localStorage) {
+      if (key == "previousVersion")
+        continue;
+      localStorage[key] = JSON.stringify(localStorage[key]);
+    }
+  },
+
+  /**
+   * previousVersion helps us migrate upon upgrades, so we should avoid changing its own format between
+   * versions.
+   */
+  setVersion: function(version) {
+    localStorage.previousVersion = version;
+  },
+
+  getPreviousVersion: function() {
+    return localStorage.previousVersion;
+  },
 };
